@@ -1,0 +1,19 @@
+PODS:
+  - NSArray+Functional (1.0.0)
+  - ReactiveCocoa (2.3.1):
+    - ReactiveCocoa/UI
+  - ReactiveCocoa/Core (2.3.1):
+    - ReactiveCocoa/no-arc
+  - ReactiveCocoa/no-arc (2.3.1)
+  - ReactiveCocoa/UI (2.3.1):
+    - ReactiveCocoa/Core
+
+DEPENDENCIES:
+  - NSArray+Functional
+  - ReactiveCocoa
+
+SPEC CHECKSUMS:
+  NSArray+Functional: 2c9ad6ab9b0dc7abe73416d265d569c8b20b9f3c
+  ReactiveCocoa: dca75777b9d18990c8714a3a6f2149f29b4d1462
+
+COCOAPODS: 0.33.1

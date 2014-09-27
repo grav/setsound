@@ -5,6 +5,7 @@
 
 #import "Controller.h"
 #import "Device.h"
+#import "NSArray+Functional.h"
 
 @import AVFoundation;
 
@@ -96,8 +97,17 @@ devicesChanged(AudioObjectID inObjectID,
     return 0;
 }
 
+- (BOOL)isLiveRunning
+{
+    return [[[NSWorkspace sharedWorkspace] runningApplications] filterUsingBlock:^BOOL(NSRunningApplication *app) {
+        return [app.bundleIdentifier isEqualToString:@"com.ableton.live"];
+    }].count > 0;
+
+}
+
 - (instancetype)init {
     if (!(self = [super init])) return nil;
+
     NSLog(@"controller init");
 
     AudioObjectPropertyAddress propertyAddress = {
@@ -110,6 +120,8 @@ devicesChanged(AudioObjectID inObjectID,
 
     CheckError(AudioObjectAddPropertyListener(kAudioObjectSystemObject, &propertyAddress, devicesChanged, this),
             "AudioObjectAddPropertyListener failed");
+
+    NSLog(@"live running? %@", [self isLiveRunning] ? @"Yes" : @"No");
 
     return self;
 }
