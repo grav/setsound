@@ -10,6 +10,8 @@
 @import AVFoundation;
 
 
+static NSString *const kAudioDeviceName = @"USB Audio CODEC";
+
 NSArray *getDevices();
 
 @interface Controller ()
@@ -120,12 +122,10 @@ devicesChanged(AudioObjectID inObjectID,
         return @([Controller isLiveRunning]);
     }] distinctUntilChanged];
 
-    NSString *deviceName = @"USB Audio CODEC";
-
     RACSignal *devices = [[RACObserve(self, devices) ignore:nil] distinctUntilChanged];
     RACSignal *audioDeviceConnected = [devices map:^id(NSArray *devs) {
         return @([devs filterUsingBlock:^BOOL(Device *d) {
-            return [d.name rangeOfString:deviceName].location != NSNotFound;
+            return [d.name rangeOfString:kAudioDeviceName].location != NSNotFound;
         }].count > 0);
     }];
 
