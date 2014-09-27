@@ -7,6 +7,8 @@
 @import AVFoundation;
 
 
+void printDevices();
+
 @implementation Controller {
 
 }
@@ -76,27 +78,9 @@ myAudioObjectPropertyListenerProc(AudioObjectID                         inObject
                                   const AudioObjectPropertyAddress      inAddresses[],
                                   void                                  *inClientData)
 {
-    UInt32 propsize;
+    printDevices();
 
-       AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyDevices,
-                                                 kAudioObjectPropertyScopeGlobal,
-                                                 kAudioObjectPropertyElementMaster };
-
-    CheckError(AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &theAddress, 0, NULL, &propsize),"AudioObjectGetPropertyDataSize failed");
-   	int nDevices = propsize / sizeof(AudioDeviceID);
-   	AudioDeviceID *devids = malloc(sizeof(AudioDeviceID) * nDevices); // propsize
-    CheckError(AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress, 0, NULL, &propsize, devids),"AudioObjectGetPropertyData failed");
-
-   	for (int i = 0; i < nDevices; ++i) {
-        AudioDeviceID testId = devids[i];
-        char name[64];
-        getDeviceName(testId, name, 64);
-        if(numChannels(testId, false)) {
-            printf("%s\n",name);
-        }
-   	}
-
-   	free(devids);    return 0;
+    return 0;
 }
 
 - (instancetype)init {
@@ -133,3 +117,27 @@ myAudioObjectPropertyListenerProc(AudioObjectID                         inObject
 
 
 @end
+
+void printDevices() {
+    UInt32 propsize;
+
+    AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyDevices,
+                                                 kAudioObjectPropertyScopeGlobal,
+                                                 kAudioObjectPropertyElementMaster };
+
+    CheckError(AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &theAddress, 0, NULL, &propsize),"AudioObjectGetPropertyDataSize failed");
+    int nDevices = propsize / sizeof(AudioDeviceID);
+    AudioDeviceID *devids = malloc(sizeof(AudioDeviceID) * nDevices); // propsize
+    CheckError(AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress, 0, NULL, &propsize, devids),"AudioObjectGetPropertyData failed");
+
+    for (int i = 0; i < nDevices; ++i) {
+        AudioDeviceID testId = devids[i];
+        char name[64];
+        getDeviceName(testId, name, 64);
+        if(numChannels(testId, false)) {
+            printf("%s\n",name);
+        }
+   	}
+
+    free(devids);
+}
