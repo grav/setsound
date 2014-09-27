@@ -6,7 +6,7 @@
 #import "Controller.h"
 #import "Device.h"
 #import "NSArray+Functional.h"
-
+#import "ReactiveCocoa.h"
 @import AVFoundation;
 
 
@@ -18,12 +18,6 @@ NSArray *getDevices();
 
 @implementation Controller {
 
-}
-
-- (void)setDevices:(NSArray *)devices {
-    _devices = devices;
-    NSLog(@"device list updated");
-    [self.comboBox reloadData];
 }
 
 // generic error handler - if err is nonzero, prints error message and exits program.
@@ -97,7 +91,7 @@ devicesChanged(AudioObjectID inObjectID,
     return 0;
 }
 
-- (BOOL)isLiveRunning
++ (BOOL)isLiveRunning
 {
     return [[[NSWorkspace sharedWorkspace] runningApplications] filterUsingBlock:^BOOL(NSRunningApplication *app) {
         return [app.bundleIdentifier isEqualToString:@"com.ableton.live"];
@@ -121,7 +115,28 @@ devicesChanged(AudioObjectID inObjectID,
     CheckError(AudioObjectAddPropertyListener(kAudioObjectSystemObject, &propertyAddress, devicesChanged, this),
             "AudioObjectAddPropertyListener failed");
 
-    NSLog(@"live running? %@", [self isLiveRunning] ? @"Yes" : @"No");
+
+    RACSignal *isLiveRunning = [[[RACSignal interval:2 onScheduler:[RACScheduler currentScheduler]] map:^id(id value) {
+        return @([Controller isLiveRunning]);
+    }] distinctUntilChanged];
+
+    NSString *deviceName = @"USB Audio CODEC";
+
+    RACSignal *devices = [[RACObserve(self, devices) ignore:nil] distinctUntilChanged];
+    RACSignal *audioDeviceConnected = [devices map:^id(NSArray *devs) {
+        return @([devs filterUsingBlock:^BOOL(Device *d) {
+            return [d.name rangeOfString:deviceName].location != NSNotFound;
+        }].count > 0);
+    }];
+
+    [[RACSignal combineLatest:@[isLiveRunning, audioDeviceConnected]
+                       reduce:^id(NSNumber *running, NSNumber *connected) {
+                           return [NSString stringWithFormat:@"running: %@, connected: %@", running, connected];
+                       }] subscribeNext:^(id x) {
+        NSLog(@"%@",x);
+    }];
+
+    self.devices = getDevices();
 
     return self;
 }
