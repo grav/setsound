@@ -12,6 +12,7 @@
 		308A65DE874D3D1DE2B8F885 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 308A6F015D7774DFBD8BEE00 /* Controller.m */; };
 		308A69939C6EEC9783493247 /* setsoundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 308A6820267AB2E430A22795 /* setsoundTests.m */; };
 		308A6A5C93790CD1A081F14D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 308A62895AE7BAA4EE395172 /* main.m */; };
+		308A6B85DDF67C935A2CF907 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = 308A6BEC8E433A861529A2BD /* Device.m */; };
 		308A6F9AB70502828D24AA1A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 308A6D26215E167545852040 /* MainMenu.xib */; };
 /* End PBXBuildFile section */
 
@@ -31,8 +32,10 @@
 		308A624E138708FBEF3FC6E3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		308A62895AE7BAA4EE395172 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		308A65CDADE9A7E87DD04B8D /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
+		308A67C45AB75885648325F0 /* Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
 		308A6820267AB2E430A22795 /* setsoundTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = setsoundTests.m; sourceTree = "<group>"; };
 		308A696B5BA76C00D559D0B0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		308A6BEC8E433A861529A2BD /* Device.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
 		308A6CDA12681F2DFDFE0FDD /* setsoundTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = setsoundTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		308A6F015D7774DFBD8BEE00 /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
 		308A6F25CA7F45F6D802BEB9 /* setsound.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = setsound.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +71,8 @@
 				308A61785747DE5D84E3C969 /* AppDelegate.m */,
 				308A6F015D7774DFBD8BEE00 /* Controller.m */,
 				308A65CDADE9A7E87DD04B8D /* Controller.h */,
+				308A6BEC8E433A861529A2BD /* Device.m */,
+				308A67C45AB75885648325F0 /* Device.h */,
 			);
 			path = setsound;
 			sourceTree = "<group>";
@@ -215,6 +220,7 @@
 				308A6A5C93790CD1A081F14D /* main.m in Sources */,
 				308A62A621A39A158F0DF8D9 /* AppDelegate.m in Sources */,
 				308A65DE874D3D1DE2B8F885 /* Controller.m in Sources */,
+				308A6B85DDF67C935A2CF907 /* Device.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

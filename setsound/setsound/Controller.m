@@ -4,14 +4,27 @@
 //
 
 #import "Controller.h"
+#import "Device.h"
+
 @import AVFoundation;
 
 
-void printDevices();
+NSArray *getDevices();
+
+@interface Controller ()
+@property(nonatomic, strong) NSArray * devices;
+@end
 
 @implementation Controller {
 
 }
+
+- (void)setDevices:(NSArray *)devices {
+    _devices = devices;
+    NSLog(@"device list updated");
+    [self.comboBox reloadData];
+}
+
 // generic error handler - if err is nonzero, prints error message and exits program.
 static void CheckError(OSStatus error, const char *operation)
 {
@@ -73,13 +86,13 @@ int numChannels(AudioDeviceID deviceID, bool inputChannels){
 }
 
 static OSStatus
-myAudioObjectPropertyListenerProc(AudioObjectID                         inObjectID,
-                                  UInt32                                inNumberAddresses,
-                                  const AudioObjectPropertyAddress      inAddresses[],
-                                  void                                  *inClientData)
+devicesChanged(AudioObjectID inObjectID,
+        UInt32 inNumberAddresses,
+        const AudioObjectPropertyAddress inAddresses[],
+        void *inClientData)
 {
-    printDevices();
-
+    Controller *c = ((__bridge Controller*)inClientData);
+    c.devices = getDevices();
     return 0;
 }
 
@@ -92,33 +105,16 @@ myAudioObjectPropertyListenerProc(AudioObjectID                         inObject
         .mScope = kAudioObjectPropertyScopeGlobal,
         .mElement = kAudioObjectPropertyElementMaster
     };
-    
-    OSStatus result = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &propertyAddress, myAudioObjectPropertyListenerProc, NULL);
 
-    
+    void *this = (__bridge void*)self;
+
+    CheckError(AudioObjectAddPropertyListener(kAudioObjectSystemObject, &propertyAddress, devicesChanged, this),
+            "AudioObjectAddPropertyListener failed");
+
     return self;
 }
 
-- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox {
-    return 10;
-}
-
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index {
-    return [NSString stringWithFormat:@"Hello %ld",(long)index];
-}
-
-- (NSString *)comboBox:(NSComboBox *)aComboBox completedString:(NSString *)string {
-    return nil;
-}
-
-- (NSUInteger)comboBox:(NSComboBox *)aComboBox indexOfItemWithStringValue:(NSString *)string {
-    return 0;
-}
-
-
-@end
-
-void printDevices() {
+NSArray *getDevices() {
     UInt32 propsize;
 
     AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyDevices,
@@ -130,14 +126,44 @@ void printDevices() {
     AudioDeviceID *devids = malloc(sizeof(AudioDeviceID) * nDevices); // propsize
     CheckError(AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress, 0, NULL, &propsize, devids),"AudioObjectGetPropertyData failed");
 
+
+    NSMutableArray *devices = [NSMutableArray array];
     for (int i = 0; i < nDevices; ++i) {
+        Device *device = [Device new];
         AudioDeviceID testId = devids[i];
         char name[64];
         getDeviceName(testId, name, 64);
-        if(numChannels(testId, false)) {
-            printf("%s\n",name);
-        }
-   	}
+        device.name = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
+        device.inputs = (NSUInteger) numChannels(testId, true);
+        device.outputs = (NSUInteger) numChannels(testId, false);
+        [devices addObject:device];
+    }
 
     free(devids);
+
+    return devices;
 }
+
+#pragma mark -- Combobox
+
+
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox {
+    return self.devices.count;
+}
+
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index {
+    return [self.devices[(NSUInteger) index] description];
+}
+
+- (NSString *)comboBox:(NSComboBox *)aComboBox completedString:(NSString *)string {
+    return nil;
+}
+
+- (NSUInteger)comboBox:(NSComboBox *)aComboBox indexOfItemWithStringValue:(NSString *)string {
+    return 0;
+}
+
+@end
+
+
+
