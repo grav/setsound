@@ -155,13 +155,7 @@ NSArray *getDevices() {
     return [self.devices[(NSUInteger) index] description];
 }
 
-- (NSString *)comboBox:(NSComboBox *)aComboBox completedString:(NSString *)string {
-    return nil;
-}
 
-- (NSUInteger)comboBox:(NSComboBox *)aComboBox indexOfItemWithStringValue:(NSString *)string {
-    return 0;
-}
 
 @end
 
