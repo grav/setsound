@@ -291,13 +291,8 @@ NSArray *getDevices() {
     return [self.devices[(NSUInteger) index] description];
 }
 
-- (void)comboBoxSelectionDidChange:(NSNotification *)notification {
-    NSLog(@"%@",notification);
-}
-
 - (void)comboBoxWillDismiss:(NSNotification *)notification {
-    NSLog(@"%@",notification);
-
+    // For signaling
 }
 
 #pragma mark -
