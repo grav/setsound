@@ -187,7 +187,9 @@ devicesChanged(AudioObjectID inObjectID,
             sleep(1);
 
             // Type the name of the device
-            [Controller type:[kAudioDeviceName lowercaseString]];
+            // weird - 'b' seems to close popup
+            NSString *string = [[kAudioDeviceName lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
+            [Controller type:string];
             sleep(1);
 
             // Type 'enter'
@@ -205,8 +207,6 @@ devicesChanged(AudioObjectID inObjectID,
 
 + (void)type:(NSString*)string
 {
-    // weird - 'b' seems to close popup
-    string = [[string lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
 
     string = [NSString stringWithFormat:@"keystroke \"%@\"",string];
 
