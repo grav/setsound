@@ -148,6 +148,9 @@ devicesChanged(AudioObjectID inObjectID,
     [[connectedAndRunning ignore:@NO] subscribeNext:^(id x) {
         NSLog(@"%@", x);
         [[Controller abletonLive] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+        // TODO - move and click mouse!
+        CGEventRef pEvent = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(500, 100), 0);
+        CGEventPost(kCGHIDEventTap, pEvent);
     }];
 
     return self;
