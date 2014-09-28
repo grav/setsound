@@ -34,6 +34,10 @@ CGKeyCode keyCodeForChar(unichar c)
 
 }
 
+- (void)setDevices:(NSArray *)devices {
+    _devices = [Controller aggregate:devices];
+}
+
 // generic error handler - if err is nonzero, prints error message and exits program.
 static void CheckError(OSStatus error, const char *operation)
 {
@@ -120,8 +124,6 @@ devicesChanged(AudioObjectID inObjectID,
 - (instancetype)init {
     if (!(self = [super init])) return nil;
 
-    NSLog(@"controller init");
-
     AudioObjectPropertyAddress propertyAddress = {
         .mSelector = kAudioHardwarePropertyDevices,
         .mScope = kAudioObjectPropertyScopeGlobal,
@@ -206,6 +208,26 @@ devicesChanged(AudioObjectID inObjectID,
     return self;
 }
 
++ (NSArray *)aggregate:(NSArray *)array {
+    NSMutableArray *aggregated = [array mutableCopy];
+    [array enumerateObjectsUsingBlock:^(Device* obj1, NSUInteger idx1, BOOL *stop1) {
+        [array enumerateObjectsUsingBlock:^(Device * obj2, NSUInteger idx2, BOOL *stop2) {
+            if(obj1 != obj2 && [obj1.name isEqualToString:obj2.name]){
+                Device *d = [Device new];
+                d.name = obj1.name;
+                d.inputs = obj1.inputs + obj2.inputs;
+                d.outputs = obj1.outputs + obj2.outputs;
+                [aggregated addObject:d];
+                [aggregated removeObject:obj1];
+                [aggregated removeObject:obj2];
+                *stop1 = YES;
+                *stop2 = YES;
+            }
+        }];
+    }];
+    return [NSSet setWithArray:aggregated].allObjects;
+}
+
 + (void)tellSystemEvents:(NSString *)string {
     NSString *src = @"\
             tell application \"System Events\"\n\
@@ -267,6 +289,15 @@ NSArray *getDevices() {
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index {
     return [self.devices[(NSUInteger) index] description];
+}
+
+- (void)comboBoxSelectionDidChange:(NSNotification *)notification {
+    NSLog(@"%@",notification);
+}
+
+- (void)comboBoxWillDismiss:(NSNotification *)notification {
+    NSLog(@"%@",notification);
+
 }
 
 #pragma mark -

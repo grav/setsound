@@ -6,6 +6,8 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
-@interface Controller : NSObject<NSComboBoxDataSource, NSUserNotificationCenterDelegate>
+@interface Controller : NSObject<NSComboBoxDataSource, NSComboBoxDelegate, NSUserNotificationCenterDelegate>
 @property (nonatomic, weak) IBOutlet NSComboBox *comboBox;
+
++ (NSArray *)aggregate:(NSArray *)array;
 @end
