@@ -5,11 +5,12 @@
 
 // To simulate mouse events, check this out:
 // https://developer.apple.com/library/mac/documentation/Carbon/Reference/QuartzEventServicesRef/Reference/reference.html#//apple_ref/c/func/CGEventCreateMouseEvent
-
+#include <Carbon/Carbon.h>
 #import "Controller.h"
 #import "Device.h"
 #import "NSArray+Functional.h"
 #import "ReactiveCocoa.h"
+
 @import AVFoundation;
 
 
@@ -18,6 +19,12 @@ static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 static NSString *const kAbletonLiveBundleId = @"com.ableton.live";
 
 NSArray *getDevices();
+
+
+/* Returns key code for given character via the above function, or UINT16_MAX
+ * on error. */
+CGKeyCode keyCodeForChar(unichar c)
+;
 
 @interface Controller ()
 @property(nonatomic, strong) NSArray * devices;
@@ -158,16 +165,76 @@ devicesChanged(AudioObjectID inObjectID,
     }];
 
 
-    [[self rac_signalForSelector:@selector(userNotificationCenter:didActivateNotification:)] subscribeNext:^(id x) {
+    [[self rac_signalForSelector:@selector(userNotificationCenter:didActivateNotification:)] subscribeNext:^(id n) {
         [[Controller abletonLive] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
         sleep(1);
         [Controller cmd_comma];
-//        // TODO - move and click mouse!
-//        CGEventRef pEvent = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(500, 100), 0);
-//        CGEventPost(kCGHIDEventTap, pEvent);
+        NSRect r = [[NSScreen mainScreen] visibleFrame];
+        CGFloat x = r.size.width / 2.0 + 100;
+        CGFloat y_in = 175.0f;
+        CGFloat y_out = 200.0f;
+
+        // cmd+, to open prefs
+        [Controller cmd_comma];
+        sleep(1);
+
+        [@[@(y_in), @(y_out)] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+
+
+            // Click the dropdown
+            CGFloat y = [obj floatValue];
+            [Controller click:CGPointMake(x, y)];
+            sleep(1);
+
+            // Type the name of the device
+            [Controller type:[kAudioDeviceName lowercaseString]];
+            sleep(1);
+
+            // Type 'enter'
+            [Controller tellSystemEvents:@"keystroke return"];
+            sleep(1);
+
+        }];
+
+        // esc
+        [Controller tellSystemEvents:@"key code 53"];
     }];
 
     return self;
+}
+
++ (void)type:(NSString*)string
+{
+    // weird - 'b' seems to close popup
+    string = [[string lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
+
+    string = [NSString stringWithFormat:@"keystroke \"%@\"",string];
+
+    [self tellSystemEvents:string];
+
+}
+
++ (void)tellSystemEvents:(NSString *)string {
+    NSString *src = @"\
+            tell application \"System Events\"\n\
+                    %@\n\
+            end tell\n\
+    ";
+
+    src = [NSString stringWithFormat:src,string];
+
+    NSDictionary* errorDict;
+    NSAppleScript* scriptObject = [[NSAppleScript alloc] initWithSource:src];
+    NSAppleEventDescriptor* returnDescriptor = [scriptObject executeAndReturnError:&errorDict];
+    NSLog(@"%@",returnDescriptor);
+}
+
++ (void)click:(CGPoint) p
+{
+    CGEventRef mouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, p, 0);
+    CGEventRef mouseUp = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, p, 0);
+    CGEventPost(kCGHIDEventTap, mouseDown);
+    CGEventPost(kCGHIDEventTap, mouseUp);
 }
 
 + (void)cmd_comma
@@ -226,7 +293,7 @@ NSArray *getDevices() {
     return devices;
 }
 
-#pragma mark -- Combobox
+#pragma mark - Combobox
 
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox {
@@ -237,7 +304,7 @@ NSArray *getDevices() {
     return [self.devices[(NSUInteger) index] description];
 }
 
-#pragma mark --
+#pragma mark -
 
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{

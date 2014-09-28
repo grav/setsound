@@ -193,8 +193,6 @@
 			mainGroup = 308A6A3B9227486BA60A7C92;
 			productRefGroup = 308A613F4FA5FAA36D2EEA00 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-			);
 			projectRoot = "";
 			targets = (
 				308A6C31B13F43455365F5B3 /* setsound */,
@@ -448,6 +446,7 @@
 				308A619061A4633D26E5B306 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		308A689956EE5ED248A96F25 /* Build configuration list for PBXNativeTarget "setsoundTests" */ = {
 			isa = XCConfigurationList;
@@ -456,6 +455,7 @@
 				308A6DE8C0A9B3C2DAEB22AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
