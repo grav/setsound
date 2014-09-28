@@ -12,6 +12,8 @@
 
 static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 
+static NSString *const kAbletonLiveBundleId = @"com.ableton.live";
+
 NSArray *getDevices();
 
 @interface Controller ()
@@ -93,11 +95,15 @@ devicesChanged(AudioObjectID inObjectID,
     return 0;
 }
 
++ (NSRunningApplication *)abletonLive{
+    return [[[[NSWorkspace sharedWorkspace] runningApplications] filterUsingBlock:^BOOL(NSRunningApplication *app) {
+        return [app.bundleIdentifier isEqualToString:kAbletonLiveBundleId];
+    }] firstObject];
+}
+
 + (BOOL)isLiveRunning
 {
-    return [[[NSWorkspace sharedWorkspace] runningApplications] filterUsingBlock:^BOOL(NSRunningApplication *app) {
-        return [app.bundleIdentifier isEqualToString:@"com.ableton.live"];
-    }].count > 0;
+    return [self abletonLive] != nil;
 
 }
 
@@ -129,14 +135,17 @@ devicesChanged(AudioObjectID inObjectID,
         }].count > 0);
     }];
 
-    [[RACSignal combineLatest:@[isLiveRunning, audioDeviceConnected]
-                       reduce:^id(NSNumber *running, NSNumber *connected) {
-                           return [NSString stringWithFormat:@"running: %@, connected: %@", running, connected];
-                       }] subscribeNext:^(id x) {
-        NSLog(@"%@",x);
-    }];
+    RACSignal *connectedAndRunning = [[RACSignal combineLatest:@[isLiveRunning, audioDeviceConnected]
+                                                        reduce:^id(NSNumber *running, NSNumber *connected) {
+                                                            return @(running.boolValue && connected.boolValue);
+                                                        }] distinctUntilChanged];
 
     self.devices = getDevices();
+
+    [[connectedAndRunning ignore:@NO] subscribeNext:^(id x) {
+        NSLog(@"%@", x);
+        [[Controller abletonLive] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+    }];
 
     return self;
 }
