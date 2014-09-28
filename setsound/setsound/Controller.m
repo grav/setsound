@@ -17,10 +17,6 @@ static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 
 static NSString *const kAbletonLiveBundleId = @"com.ableton.live";
 
-static const int kKeycodeCmd = 0x38;
-
-static const int kKeycodeComma = 43;
-
 NSArray *getDevices();
 
 @interface Controller ()
@@ -179,10 +175,10 @@ devicesChanged(AudioObjectID inObjectID,
       CGEventSourceRef src =
         CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
 
-      CGEventRef cmd_dn = CGEventCreateKeyboardEvent(src, kKeycodeCmd, true);
-      CGEventRef cmd_up = CGEventCreateKeyboardEvent(src, kKeycodeCmd, false);
-      CGEventRef comma_dn = CGEventCreateKeyboardEvent(src, kKeycodeComma, true);
-      CGEventRef comma_up = CGEventCreateKeyboardEvent(src, kKeycodeComma, false);
+      CGEventRef cmd_dn = CGEventCreateKeyboardEvent(src, kVK_Command, true);
+      CGEventRef cmd_up = CGEventCreateKeyboardEvent(src, kVK_Command, false);
+      CGEventRef comma_dn = CGEventCreateKeyboardEvent(src, kVK_ANSI_Comma, true);
+      CGEventRef comma_up = CGEventCreateKeyboardEvent(src, kVK_ANSI_Comma, false);
 
       CGEventSetFlags(comma_dn, kCGEventFlagMaskCommand);
       CGEventSetFlags(comma_up, kCGEventFlagMaskCommand);
