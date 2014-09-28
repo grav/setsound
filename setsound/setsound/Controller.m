@@ -17,6 +17,10 @@ static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 
 static NSString *const kAbletonLiveBundleId = @"com.ableton.live";
 
+static const int kKeycodeCmd = 0x38;
+
+static const int kKeycodeComma = 43;
+
 NSArray *getDevices();
 
 @interface Controller ()
@@ -147,13 +151,53 @@ devicesChanged(AudioObjectID inObjectID,
 
     [[connectedAndRunning ignore:@NO] subscribeNext:^(id x) {
         NSLog(@"%@", x);
+        NSUserNotification *notification = [NSUserNotification new];
+        notification.hasActionButton = YES;
+        notification.actionButtonTitle = @"Select";
+        notification.title = @"Audio device connected";
+        notification.informativeText = [NSString stringWithFormat:@"%@ has been connected. Select in Live?",kAudioDeviceName];
+        [NSUserNotificationCenter defaultUserNotificationCenter].delegate = self;
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+
+    }];
+
+
+    [[self rac_signalForSelector:@selector(userNotificationCenter:didActivateNotification:)] subscribeNext:^(id x) {
         [[Controller abletonLive] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
-        // TODO - move and click mouse!
-        CGEventRef pEvent = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(500, 100), 0);
-        CGEventPost(kCGHIDEventTap, pEvent);
+        sleep(1);
+        [Controller cmd_comma];
+//        // TODO - move and click mouse!
+//        CGEventRef pEvent = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(500, 100), 0);
+//        CGEventPost(kCGHIDEventTap, pEvent);
     }];
 
     return self;
+}
+
++ (void)cmd_comma
+{
+      CGEventSourceRef src =
+        CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+
+      CGEventRef cmd_dn = CGEventCreateKeyboardEvent(src, kKeycodeCmd, true);
+      CGEventRef cmd_up = CGEventCreateKeyboardEvent(src, kKeycodeCmd, false);
+      CGEventRef comma_dn = CGEventCreateKeyboardEvent(src, kKeycodeComma, true);
+      CGEventRef comma_up = CGEventCreateKeyboardEvent(src, kKeycodeComma, false);
+
+      CGEventSetFlags(comma_dn, kCGEventFlagMaskCommand);
+      CGEventSetFlags(comma_up, kCGEventFlagMaskCommand);
+
+      CGEventTapLocation loc = kCGHIDEventTap; // kCGSessionEventTap also works
+      CGEventPost(loc, cmd_dn);
+      CGEventPost(loc, comma_dn);
+      CGEventPost(loc, comma_up);
+      CGEventPost(loc, cmd_up);
+
+      CFRelease(cmd_dn);
+      CFRelease(cmd_up);
+      CFRelease(comma_dn);
+      CFRelease(comma_up);
+      CFRelease(src);
 }
 
 NSArray *getDevices() {
@@ -195,6 +239,17 @@ NSArray *getDevices() {
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index {
     return [self.devices[(NSUInteger) index] description];
+}
+
+#pragma mark --
+
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{
+    return YES;
+}
+
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification {
+    // For signaling
 }
 
 

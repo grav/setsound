@@ -10,7 +10,7 @@
 #import "AppDelegate.h"
 #import "Controller.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <NSUserNotificationCenterDelegate>
 
 @property (weak) IBOutlet NSWindow *window;
 @property(nonatomic, strong) Controller *controller;
@@ -21,12 +21,10 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     self.controller = [Controller new];
-    // Insert code here to initialize your application
+    // Insert code here to initialize your application}
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
 }
-
 
 @end
