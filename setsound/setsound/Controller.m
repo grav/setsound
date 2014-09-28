@@ -168,14 +168,13 @@ devicesChanged(AudioObjectID inObjectID,
     [[self rac_signalForSelector:@selector(userNotificationCenter:didActivateNotification:)] subscribeNext:^(id n) {
         [[Controller abletonLive] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
         sleep(1);
-        [Controller cmd_comma];
         NSRect r = [[NSScreen mainScreen] visibleFrame];
         CGFloat x = r.size.width / 2.0 + 100;
         CGFloat y_in = 175.0f;
         CGFloat y_out = 200.0f;
 
         // cmd+, to open prefs
-        [Controller cmd_comma];
+        [Controller tellSystemEvents:@"keystroke \",\" using command down"];
         sleep(1);
 
         [@[@(y_in), @(y_out)] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -236,33 +235,6 @@ devicesChanged(AudioObjectID inObjectID,
     CGEventPost(kCGHIDEventTap, mouseDown);
     CGEventPost(kCGHIDEventTap, mouseUp);
 }
-
-+ (void)cmd_comma
-{
-      CGEventSourceRef src =
-        CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
-
-      CGEventRef cmd_dn = CGEventCreateKeyboardEvent(src, kVK_Command, true);
-      CGEventRef cmd_up = CGEventCreateKeyboardEvent(src, kVK_Command, false);
-      CGEventRef comma_dn = CGEventCreateKeyboardEvent(src, kVK_ANSI_Comma, true);
-      CGEventRef comma_up = CGEventCreateKeyboardEvent(src, kVK_ANSI_Comma, false);
-
-      CGEventSetFlags(comma_dn, kCGEventFlagMaskCommand);
-      CGEventSetFlags(comma_up, kCGEventFlagMaskCommand);
-
-      CGEventTapLocation loc = kCGHIDEventTap; // kCGSessionEventTap also works
-      CGEventPost(loc, cmd_dn);
-      CGEventPost(loc, comma_dn);
-      CGEventPost(loc, comma_up);
-      CGEventPost(loc, cmd_up);
-
-      CFRelease(cmd_dn);
-      CFRelease(cmd_up);
-      CFRelease(comma_dn);
-      CFRelease(comma_up);
-      CFRelease(src);
-}
-
 NSArray *getDevices() {
     UInt32 propsize;
 
