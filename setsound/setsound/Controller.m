@@ -140,6 +140,11 @@ devicesChanged(AudioObjectID inObjectID,
         return @([Controller isLiveRunning]);
     }] distinctUntilChanged];
 
+    RACSignal *selected = [[self rac_signalForSelector:@selector(comboBoxWillDismiss:)] map:^id(RACTuple *args) {
+        NSComboBox *c = [[args first] object];
+        NSInteger idx = c.indexOfSelectedItem;
+        return idx == -1 ? nil : self.devices[(NSUInteger) idx];
+    }];
     RACSignal *devices = [[RACObserve(self, devices) ignore:nil] distinctUntilChanged];
     RACSignal *audioDeviceConnected = [devices map:^id(NSArray *devs) {
         return @([devs filterUsingBlock:^BOOL(Device *d) {
