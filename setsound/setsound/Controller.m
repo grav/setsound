@@ -188,7 +188,9 @@ devicesChanged(AudioObjectID inObjectID,
             // Type the name of the device
             // weird - 'b' seems to close popup
             NSString *string = [[kAudioDeviceName lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
-            [Controller type:string];
+            NSString *applescript = [NSString stringWithFormat:@"keystroke \"%@\"", string];
+            [Controller tellSystemEvents:applescript];
+
             sleep(1);
 
             // Type 'enter'
@@ -202,15 +204,6 @@ devicesChanged(AudioObjectID inObjectID,
     }];
 
     return self;
-}
-
-+ (void)type:(NSString*)string
-{
-
-    string = [NSString stringWithFormat:@"keystroke \"%@\"",string];
-
-    [self tellSystemEvents:string];
-
 }
 
 + (void)tellSystemEvents:(NSString *)string {
