@@ -3,6 +3,9 @@
 // Copyright (c) 2014 Betafunk. All rights reserved.
 //
 
+// To simulate mouse events, check this out:
+// https://developer.apple.com/library/mac/documentation/Carbon/Reference/QuartzEventServicesRef/Reference/reference.html#//apple_ref/c/func/CGEventCreateMouseEvent
+
 #import "Controller.h"
 #import "Device.h"
 #import "NSArray+Functional.h"
