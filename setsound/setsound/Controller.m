@@ -20,12 +20,6 @@ static NSString *const kAbletonLiveBundleId = @"com.ableton.live";
 
 NSArray *getDevices();
 
-
-/* Returns key code for given character via the above function, or UINT16_MAX
- * on error. */
-CGKeyCode keyCodeForChar(unichar c)
-;
-
 @interface Controller ()
 @property(nonatomic, strong) NSArray * devices;
 @end
