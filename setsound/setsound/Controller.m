@@ -14,8 +14,6 @@
 
 static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 
-NSArray *getDevices();
-
 @implementation Controller {
 
 }
@@ -60,7 +58,7 @@ NSArray *getDevices();
                                                             return @(running.boolValue && connected.boolValue);
                                                         }] distinctUntilChanged];
 
-    self.devices = getDevices();
+    self.devices = [Helper getCurrentDevices];
 
     [[connectedAndRunning ignore:@NO] subscribeNext:^(id x) {
         NSLog(@"%@", x);

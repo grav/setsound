@@ -12,13 +12,16 @@
 
 + (void)setupDeviceChangeListening:(Controller *)c;
 
-+ (NSRunningApplication *)abletonLive;
-
-+ (BOOL)isLiveRunning;
-
 + (NSArray *)aggregate:(NSArray *)array;
+
++ (NSArray *)getCurrentDevices;
 
 + (void)tellSystemEvents:(NSString *)string;
 
 + (void)click:(CGPoint)p;
+
++ (NSRunningApplication *)abletonLive;
+
++ (BOOL)isLiveRunning;
+
 @end
