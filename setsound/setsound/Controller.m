@@ -11,8 +11,6 @@
 #import "ReactiveCocoa.h"
 #import "Helper.h"
 
-static NSString *const kAudioDeviceName = @"USB Audio CODEC";
-
 static NSString *const kPreferredDevice = @"PreferredDevice";
 
 @implementation Controller {
@@ -82,7 +80,9 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
         notification.hasActionButton = YES;
         notification.actionButtonTitle = @"Select";
         notification.title = @"Audio device connected";
-        notification.informativeText = [NSString stringWithFormat:@"%@ has been connected. Select in Live?",kAudioDeviceName];
+        NSString *deviceName = [self preferredDevice].name;
+
+        notification.informativeText = [NSString stringWithFormat:@"%@ has been connected. Select in Live?",deviceName];
         [NSUserNotificationCenter defaultUserNotificationCenter].delegate = self;
         [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 
@@ -111,7 +111,9 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
 
             // Type the name of the device
             // weird - 'b' seems to close popup
-            NSString *string = [[kAudioDeviceName lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
+            NSString *deviceName = [self preferredDevice].name;
+
+            NSString *string = [[deviceName lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
             NSString *applescript = [NSString stringWithFormat:@"keystroke \"%@\"", string];
             [Helper tellSystemEvents:applescript];
 
@@ -139,7 +141,7 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
 
 - (void)updatePreferredLabel {
     Device *d = [self preferredDevice];
-    [self.preferredLabel setStringValue:d.name ?: @"(none)"];
+    [self.preferredLabel setStringValue:d ? [d description] : @"(none)"];
 }
 
 
