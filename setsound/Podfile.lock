@@ -1,4 +1,5 @@
 PODS:
+  - AutoCoding (2.2)
   - NSArray+Functional (1.0.0)
   - ReactiveCocoa (2.3.1):
     - ReactiveCocoa/UI
@@ -9,10 +10,12 @@ PODS:
     - ReactiveCocoa/Core
 
 DEPENDENCIES:
+  - AutoCoding
   - NSArray+Functional
   - ReactiveCocoa
 
 SPEC CHECKSUMS:
+  AutoCoding: 2a15d57acf78912b72cc3b3a472e614b2f112a18
   NSArray+Functional: 2c9ad6ab9b0dc7abe73416d265d569c8b20b9f3c
   ReactiveCocoa: dca75777b9d18990c8714a3a6f2149f29b4d1462
 

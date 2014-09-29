@@ -8,7 +8,6 @@
 #include <Carbon/Carbon.h>
 #import "Controller.h"
 #import "Device.h"
-#import "NSArray+Functional.h"
 #import "ReactiveCocoa.h"
 #import "Helper.h"
 
@@ -37,16 +36,18 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
         return @([Helper isLiveRunning]);
     }] distinctUntilChanged];
 
-    RACSignal *selected = [[self rac_signalForSelector:@selector(comboBoxWillDismiss:)] map:^id(RACTuple *args) {
+    RACSignal *selected = [[[[[self rac_signalForSelector:@selector(comboBoxWillDismiss:)] map:^id(RACTuple *args) {
         NSComboBox *c = [[args first] object];
         NSInteger idx = c.indexOfSelectedItem;
-        return idx == -1 ? nil : self.devices[(NSUInteger) idx];
-    }];
-
+        return @(idx);
+    }] ignore:@(-1)] map:^id(NSNumber*idx) {
+        NSUInteger index = idx.unsignedIntegerValue;
+        return index == 0 ? nil : self.devices[index-1];
+    }] startWith:[self preferredDevice]];
 
     [selected subscribeNext:^(Device *d) {
-        NSString *value = d.name;
-        [[NSUserDefaults standardUserDefaults] setValue:value forKey:kPreferredDevice];
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:d];
+        [[NSUserDefaults standardUserDefaults] setValue:data forKey:kPreferredDevice];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self updatePreferredLabel];
     }];
@@ -57,18 +58,19 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
 
     RACSignal *devices = [[RACObserve(self, devices) ignore:nil] distinctUntilChanged];
 
-//    [RACSignal combineLatest:@[selected,devices] reduce:^id(Device *d, NSArray *devs) {
-//        return nil;
-//    }]
-
-    RACSignal *audioDeviceConnected = [devices map:^id(NSArray *devs) {
-        return @([devs filterUsingBlock:^BOOL(Device *d) {
-            return [d.name rangeOfString:kAudioDeviceName].location != NSNotFound;
-        }].count > 0);
+    [devices subscribeNext:^(id x) {
+        [self.comboBox reloadData];
     }];
+
+    RACSignal *audioDeviceConnected = [[RACSignal combineLatest:@[selected,devices] reduce:^id(Device *d, NSArray *devs) {
+        BOOL b = [devs containsObject:d];
+        return @(b);
+    }] logNext];
+
 
     RACSignal *connectedAndRunning = [[RACSignal combineLatest:@[isLiveRunning, audioDeviceConnected]
                                                         reduce:^id(NSNumber *running, NSNumber *connected) {
+
                                                             return @(running.boolValue && connected.boolValue);
                                                         }] distinctUntilChanged];
 
@@ -128,9 +130,16 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
     return self;
 }
 
+- (Device*)preferredDevice
+{
+    NSData *data = [[NSUserDefaults standardUserDefaults] valueForKey:kPreferredDevice];
+    Device *d = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    return d;
+}
+
 - (void)updatePreferredLabel {
-    NSString *preferredName = [[NSUserDefaults standardUserDefaults] valueForKey:kPreferredDevice];
-    [self.preferredLabel setStringValue:preferredName ?: @"(none)"];
+    Device *d = [self preferredDevice];
+    [self.preferredLabel setStringValue:d.name ?: @"(none)"];
 }
 
 
@@ -138,11 +147,11 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
 
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox {
-    return self.devices.count;
+    return self.devices.count + 1;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index {
-    return [self.devices[(NSUInteger) index] description];
+    return index == 0 ? @"(none)" : [self.devices[(NSUInteger) index-1] description];
 }
 
 - (void)comboBoxWillDismiss:(NSNotification *)notification {
