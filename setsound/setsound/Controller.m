@@ -14,6 +14,8 @@
 
 static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 
+static NSString *const kPreferredDevice = @"PreferredDevice";
+
 @implementation Controller {
 
 }
@@ -39,6 +41,18 @@ static NSString *const kAudioDeviceName = @"USB Audio CODEC";
         NSComboBox *c = [[args first] object];
         NSInteger idx = c.indexOfSelectedItem;
         return idx == -1 ? nil : self.devices[(NSUInteger) idx];
+    }];
+
+
+    [selected subscribeNext:^(Device *d) {
+        NSString *value = d.name;
+        [[NSUserDefaults standardUserDefaults] setValue:value forKey:kPreferredDevice];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self updatePreferredLabel];
+    }];
+
+    [[RACObserve(self, preferredLabel) ignore:nil] subscribeNext:^(id x) {
+        [self updatePreferredLabel];
     }];
 
     RACSignal *devices = [[RACObserve(self, devices) ignore:nil] distinctUntilChanged];
@@ -113,6 +127,12 @@ static NSString *const kAudioDeviceName = @"USB Audio CODEC";
 
     return self;
 }
+
+- (void)updatePreferredLabel {
+    NSString *preferredName = [[NSUserDefaults standardUserDefaults] valueForKey:kPreferredDevice];
+    [self.preferredLabel setStringValue:preferredName ?: @"(none)"];
+}
+
 
 #pragma mark - Combobox
 

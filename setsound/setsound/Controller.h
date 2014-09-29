@@ -8,7 +8,7 @@
 
 @interface Controller : NSObject<NSComboBoxDataSource, NSComboBoxDelegate, NSUserNotificationCenterDelegate>
 @property (nonatomic, weak) IBOutlet NSComboBox *comboBox;
-@property (nonatomic, weak) IBOutlet NSTextField *preferred;
+@property (nonatomic, weak) IBOutlet NSTextField *preferredLabel;
 @property(nonatomic, strong) NSArray * devices;
 
 @end
