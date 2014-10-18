@@ -91,23 +91,33 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
 
     [[self rac_signalForSelector:@selector(userNotificationCenter:didActivateNotification:)] subscribeNext:^(id n) {
         [[Helper abletonLive] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
-        sleep(1);
+        CGFloat us = 1000000;
+        usleep(0.1 * us);
+
+        // cmd+, to open prefs
+
+        [Helper tellSystemEvents:@"keystroke \",\" using command down"];
+        usleep(0.1*us);
         NSRect r = [[NSScreen mainScreen] visibleFrame];
-        CGFloat x = r.size.width / 2.0 + 100;
+
+        CGFloat x_audio = r.size.width / 2.0 - 200;
+        CGFloat y_audio = 160.0f;
+        
+        [Helper click:CGPointMake(x_audio,y_audio)];
+        
+        CGFloat x_in_out = r.size.width / 2.0 + 100;
         CGFloat y_in = 175.0f;
         CGFloat y_out = 200.0f;
 
-        // cmd+, to open prefs
-        [Helper tellSystemEvents:@"keystroke \",\" using command down"];
-        sleep(1);
-
+        
+        
         [@[@(y_in), @(y_out)] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 
 
             // Click the dropdown
             CGFloat y = [obj floatValue];
-            [Helper click:CGPointMake(x, y)];
-            sleep(1);
+            [Helper click:CGPointMake(x_in_out, y)];
+            usleep(0.1*us);
 
             // Type the name of the device
             // weird - 'b' seems to close popup
@@ -116,12 +126,10 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
             NSString *string = [[deviceName lowercaseString] stringByReplacingOccurrencesOfString:@"b" withString:@""];
             NSString *applescript = [NSString stringWithFormat:@"keystroke \"%@\"", string];
             [Helper tellSystemEvents:applescript];
-
-            sleep(1);
-
+            
             // Type 'enter'
             [Helper tellSystemEvents:@"keystroke return"];
-            sleep(1);
+            usleep(0.5 * us);
 
         }];
 
