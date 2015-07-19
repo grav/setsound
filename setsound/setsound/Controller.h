@@ -10,5 +10,6 @@
 @property (nonatomic, weak) IBOutlet NSComboBox *comboBox;
 @property (nonatomic, weak) IBOutlet NSTextField *preferredLabel;
 @property(nonatomic, strong) NSArray * devices;
+@property (weak) IBOutlet NSButton *selectButton;
 
 @end
