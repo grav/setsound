@@ -2,7 +2,7 @@ PODS:
   - AutoCoding (2.2)
   - NSArray+Functional (1.0.0)
   - ReactiveCocoa (2.3.1):
-    - ReactiveCocoa/UI
+    - ReactiveCocoa/UI (= 2.3.1)
   - ReactiveCocoa/Core (2.3.1):
     - ReactiveCocoa/no-arc
   - ReactiveCocoa/no-arc (2.3.1)
@@ -15,8 +15,8 @@ DEPENDENCIES:
   - ReactiveCocoa
 
 SPEC CHECKSUMS:
-  AutoCoding: 2a15d57acf78912b72cc3b3a472e614b2f112a18
-  NSArray+Functional: 2c9ad6ab9b0dc7abe73416d265d569c8b20b9f3c
-  ReactiveCocoa: dca75777b9d18990c8714a3a6f2149f29b4d1462
+  AutoCoding: 17baf547ff7ace02b7e802d09e67b3b7419a6a05
+  NSArray+Functional: 70450a935ad6cf933f675251311c14385815506d
+  ReactiveCocoa: 3fe9b233ca6db810e86681b5749488564c1179a1
 
-COCOAPODS: 0.33.1
+COCOAPODS: 0.38.2
