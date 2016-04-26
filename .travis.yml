@@ -4,9 +4,9 @@
 
 language: objective-c
 # cache: cocoapods
-podfile: Podfile
-before_install: pod install
+podfile: setsound/Podfile
+before_install: cd setsound && pod install && cd -
 install:
 - gem install xcpretty --no-rdoc --no-ri --no-document --quiet
 script:
-- set -o pipefail && xcodebuild -workspace setsound.xcworkspace -scheme setsound -sdk macosx ONLY_ACTIVE_ARCH=NO | xcpretty -c
+- set -o pipefail && xcodebuild -workspace setsound/setsound.xcworkspace -scheme setsound -sdk macosx ONLY_ACTIVE_ARCH=NO | xcpretty -c
