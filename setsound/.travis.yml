@@ -1,0 +1,12 @@
+# references:
+# * http://www.objc.io/issue-6/travis-ci.html
+# * https://github.com/supermarin/xcpretty#usage
+
+language: objective-c
+# cache: cocoapods
+podfile: Podfile
+before_install: pod install
+install:
+- gem install xcpretty --no-rdoc --no-ri --no-document --quiet
+script:
+- set -o pipefail && xcodebuild -workspace setsound.xcworkspace -scheme setsound -sdk macosx ONLY_ACTIVE_ARCH=NO | xcpretty -c
