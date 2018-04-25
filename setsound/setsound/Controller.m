@@ -109,19 +109,19 @@ static NSString *const kPreferredDevice = @"PreferredDevice";
     // cmd+, to open prefs
     
     [Helper tellSystemEvents:@"keystroke \",\" using command down"];
-    usleep(0.1*us);
+    usleep(0.2*us);
     NSRect r = [[NSScreen mainScreen] visibleFrame];
     
     CGFloat x_audio = r.size.width / 2.0 - 200;
-    CGFloat y_audio = 220.0f;
+    CGFloat y_audio = 200.0f;
     
     [Helper click:CGPointMake(x_audio,y_audio)];
     
     CGFloat x_in_out = r.size.width / 2.0 + 100;
-    CGFloat y_in = 230.0f;
-    CGFloat y_out = 250.0f;
     
     
+    CGFloat y_in = 205.0f;
+    CGFloat y_out = 225.0f;
     
     [@[@(y_in), @(y_out)] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         
