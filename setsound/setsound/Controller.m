@@ -8,7 +8,7 @@
 #include <Carbon/Carbon.h>
 #import "Controller.h"
 #import "Device.h"
-#import "ReactiveCocoa.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
 #import "Helper.h"
 
 static NSString *const kPreferredDevice = @"PreferredDevice";
